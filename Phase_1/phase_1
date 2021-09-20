@@ -1,1 +1,52 @@
+Using objdump -d bomb | more to look at the assembly code for the next phase:
 
+PHASE 1
+break phase_1
+Breakpoint 2 at 0x400e8d
+
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Bomb Defused
+
+Breakpoint 2, 0x0000000000400e8d in phase_1 ()
+
+Assembly Code
+   	0x0000000000400e8d <+0>:	sub    $0x8,%rsp   //Building stack frame with 8 bytes
+=>  	0x0000000000400e91 <+4>:	mov    $0x4023cc,%esi
+   	0x0000000000400e96 <+9>:	callq  0x401339 <strings_not_equal>   //Compares the input strings with the answer
+   	
+// x/s 0x4023cc
+// 0x4023cc:	"Public speaking is very easy."
+//This string is moved to %esi and will be passed into <strings_not_equal>. Since <strings_not_equal> doesn't call a bomb, it's okay to execute.
+
+(gdb) i r
+rax            0x1                 1    //Will call the bomb as 1x1 which mean the bomb will explode
+rbx            0x4021f0            4202992
+rcx            0xc                 12
+rdx            0x1                 1
+
+=>   0x0000000000400e9b <+14>:	test   %eax,%eax     //Performs a bitwise AND on two operands.
+   	0x0000000000400e9d <+16>:	je     0x400ea4 <phase_1+23>    //Jump if the values are equal
+  	0x0000000000400e9f <+18>:	callq  0x401438 <explode_bomb>
+  	0x0000000000400ea4 <+23>:	add    $0x8,%rsp
+   	0x0000000000400ea8 <+27>:	retq  
+   	
+(gdb) i r
+rax            0x0                 0    //%rax is equal to 0 ehich mean the bomb will not explode
+rbx            0x4021f0            4202992
+rcx            0x1d                29
+rdx            0x0                 0
+
+//The string to defuse the bomb is "Public speaking is very easy."
+
+
+Output
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Public speaking is very easy.
+Phase 1 defused. How about the next one?
+
+Description
+It pushes a string onto the stack before callin the function <strings_not_equal>. 
+The given string  is stored in $eax register and other in 0x401339. If the strings are equal the function runs <je> and jumps over <explode_bomb>.
+In phase 1, it takes a user input and compares with the input stored in $eax register.
