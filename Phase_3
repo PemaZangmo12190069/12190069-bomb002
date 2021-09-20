@@ -1,1 +1,117 @@
+PHASE 3
+  (gdb) break phase_3
+Breakpoint 1 at 0x400f0d
+2 490   //Putting test inputs
 
+Breakpoint 1, 0x0000000000400f0d in phase_3 ()
+
+Assembly Code
+disas phase_3
+   	0x0000000000400f0d <+0>:	sub    $0x18,%rsp
+   	0x0000000000400f11 <+4>:	mov    %fs:0x28,%rax
+   	0x0000000000400f1a <+13>:	mov    %rax,0x8(%rsp)
+   	0x0000000000400f1f <+18>:	xor    %eax,%eax
+   	0x0000000000400f21 <+20>:	lea    0x4(%rsp),%rcx
+   	0x0000000000400f26 <+25>:	mov    %rsp,%rdx
+   	0x0000000000400f29 <+28>:	mov    $0x4025b7,%esi
+   	0x0000000000400f2e <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>   //scans input
+// x/s 0x4025b7
+// 0x4025b7:	"%d %d"
+//From here we know that the inputs have to be two integer. 
+
+=>   0x0000000000400f33 <+38>:	cmp    $0x1,%eax    //checks input format
+
+//Here  value 1 and the given first input is compared
+
+=>  	0x0000000000400f36 <+41>:	jg     0x400f3d <phase_3+48>   	
+   	0x0000000000400f38 <+43>:	callq  0x401438 <explode_bomb>
+   	
+//If the given input is greater than 1 it jumps to <+48> if not bomb explodes.
+
+=>  	0x0000000000400f3d <+48>:	cmpl   $0x7,(%rsp)
+   	0x0000000000400f41 <+52>:	ja     0x400f9e <phase_3+145>
+   	
+ //Here given first integer is again compared to 7. From here, we can conclude that the first integer is between 1 and 7. 
+//If the given input is greater than 7 it jumps to <+145> and the bomb explodes.
+
+   	0x0000000000400f43 <+54>:	mov    (%rsp),%eax
+   	0x0000000000400f46 <+57>:	jmpq   *0x402400(,%rax,8)    
+   	
+//Jumps directly to the absolute address stored at 8 * %rax + 0x402400 	
+//Jumps to <+83>
+
+   	0x0000000000400f4d <+64>:	mov    $0x380,%eax
+   	0x0000000000400f52 <+69>:	jmp    0x400f59 <phase_3+76>   //Performs an unconditional jump
+   	0x0000000000400f54 <+71>:	mov    $0x0,%eax
+   	0x0000000000400f59 <+76>:	sub    $0x3e4,%eax
+   	0x0000000000400f5e <+81>:	jmp    0x400f65 <phase_3+88>
+=>  	0x0000000000400f60 <+83>:	mov    $0x0,%eax
+
+=>  	0x0000000000400f65 <+88>:	add    $0x21e,%eax
+   	0x0000000000400f6a <+93>:	jmp    0x400f71 <phase_3+100>
+   	
+//0x21e =   542 is added with the value stored in %eax register.  %eax = 0, Therefore, Value stored is 542.
+// Jumps to next instruction
+
+   	0x0000000000400f6c <+95>:	mov    $0x0,%eax
+=>  	0x0000000000400f71 <+100>:	sub    $0x34,%eax
+   	0x0000000000400f74 <+103>:	jmp    0x400f7b <phase_3+110>
+   	
+// The value in %eax (542) is subtracted with 0x34 (52), which is equal to 490
+//After that jump to <+110>
+
+  	0x0000000000400f76 <+105>:	mov    $0x0,%eax
+=>  	0x0000000000400f7b <+110>:	add    $0x34,%eax
+   	0x0000000000400f7e <+113>:	jmp    0x400f85 <phase_3+120>
+   	
+// Add the value in %eax (490) with with 0x34 (52), which is equal to 542
+//Jump to <+120>
+
+   	0x0000000000400f80 <+115>:	mov    $0x0,%eax
+=>  	0x0000000000400f85 <+120>:	sub    $0x34,%eax
+   	0x0000000000400f88 <+123>:	jmp    0x400f8f <phase_3+130>
+   	
+//Subtract the value in %eax(542) with 0x34 (52), which is equal to 490
+//Jump to <+130>
+   	
+   	0x0000000000400f8a <+125>:	mov    $0x0,%eax
+=>  	0x0000000000400f8f <+130>:	add    $0x34,%eax
+   	0x0000000000400f92 <+133>:	jmp    0x400f99 <phase_3+140>
+   	
+ //Add the value in %eax (490) with 0x34, which is equal to 542
+ //Jump to <+140>
+ 
+   	0x0000000000400f94 <+135>:	mov    $0x0,%eax
+=>  	0x0000000000400f99 <+140>:	sub    $0x34,%eax
+   	0x0000000000400f9c <+143>:	jmp    0x400fa8 <phase_3+155>
+   	0x0000000000400f9e <+145>:	callq  0x401438 <explode_bomb>
+   	
+//Subtract the value in %eax (542) with 0x34 (52), which is equal to 490
+//Jump to <+155>
+   	
+   	0x0000000000400fa3 <+150>:	mov    $0x0,%eax
+=>  	0x0000000000400fa8 <+155>:	cmpl   $0x5,(%rsp)
+   	0x0000000000400fac <+159>:	jg     0x400fb4 <phase_3+167>
+   	
+//Compare 5 with the value store in %rsp (2)
+//Jump to <+167> if the value stored in %rsp is greater
+
+=>  	0x0000000000400fae <+161>:	cmp    0x4(%rsp),%eax
+   	0x0000000000400fb2 <+165>:	je     0x400fb9 <phase_3+172>
+   	0x0000000000400fb4 <+167>:	callq  0x401438 <explode_bomb>
+   	
+ //Compare the given integer (490) with the value stored in %eax (490)
+ //To find the given integer - p/x * (int *)($rsp + 0x4)
+ //If the values are equal jump to <+172>
+ 
+   	0x0000000000400fb9 <+172>:	mov    0x8(%rsp),%rax
+   	0x0000000000400fbe <+177>:	xor    %fs:0x28,%rax
+   	0x0000000000400fc7 <+186>:	je     0x400fce <phase_3+193>
+   	0x0000000000400fc9 <+188>:	callq  0x400b00 <__stack_chk_fail@plt>
+   	0x0000000000400fce <+193>:	add    $0x18,%rsp
+   	0x0000000000400fd2 <+197>:	retq   
+// The final two integer is 2 and 490
+   
+   Output
+   2 490
+   Halfway there!
