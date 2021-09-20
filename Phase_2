@@ -1,1 +1,81 @@
+PHASE 2
+(gdb) break phase_2
+Breakpoint 1 at 0x400ea9
 
+1 2 4 8 16 32
+
+Breakpoint 1, 0x0000000000400ea9 in phase_2 ()
+
+Assembly Code
+=>   0x0000000000400ea9 <+0>:	push   %rbp   //Inserts a value to the stack
+   	0x0000000000400eaa <+1>:	push   %rbx
+   	0x0000000000400eab <+2>:	sub    $0x28,%rsp    //Makes a stack frame of 56 bytes
+   	0x0000000000400eaf <+6>:	mov    %fs:0x28,%rax
+   	0x0000000000400eb8 <+15>:	mov    %rax,0x18(%rsp)
+   	
+// (gdb) p/x $rax
+// $1 = 0x6037f0
+
+// (gdb) x/s 0x6037f0
+// 0x402799:       "%d %d %d %d %d %d"   Format of our answer
+
+   	0x0000000000400ebd <+20>:	xor    %eax,%eax  //Performs bitwise Exclusive OR operation
+   	0x0000000000400ebf <+22>:	mov    %rsp,%rsi
+   	0x0000000000400ec2 <+25>:	callq  0x40145a <read_six_numbers>    //Stores 6 input integers
+=>  	0x0000000000400ec7 <+30>:	cmpl   $0x1,(%rsp)   //Compares the content of registers	
+   	0x0000000000400ecb <+34>:	je     0x400ed2 <phase_2+41>
+   	0x0000000000400ecd <+36>:	callq  0x401438 <explode_bomb>
+   	
+//Compare the value in %rsp ( 1) to 1   
+//Jump to <+41> if the values are equal
+   	
+   	0x0000000000400ed2 <+41>:	mov    %rsp,%rbx
+   	0x0000000000400ed5 <+44>:	lea    0x14(%rsp),%rbp    //Places the address specified by its first operand  into the registers
+   	0x0000000000400eda <+49>:	mov    (%rbx),%eax
+=>  	0x0000000000400edc <+51>:	add    %eax,%eax
+   	0x0000000000400ede <+53>:	cmp    %eax,0x4(%rbx)
+   	0x0000000000400ee1 <+56>:	je     0x400ee8 <phase_2+63>
+   	0x0000000000400ee3 <+58>:	callq  0x401438 <explode_bomb>
+   	
+// Add the value in %eax (1), which is equal to 2
+//Compare the given value (2) with value stored in %eax (2)
+// (gdb) p/x *(int *)($rbx + 0x4), To find the given integer
+// $2 = 0x2
+//Jump to <+63> if the values are equal
+//The second value 2 is confirmed
+
+   	0x0000000000400ee8 <+63>:	add    $0x4,%rbx
+=>  	0x0000000000400eec <+67>:	cmp    %rbp,%rbx
+   	0x0000000000400eef <+70>:	jne    0x400eda <phase_2+49>   //jump if the values are not equal
+   	
+// Compare the value in %rbp (32) and %rbx (2) 
+// If the values are not equal jump to <+49> 
+//Looking at <+70>, we see that the instructions are jumped again at <+49> till $rbp and %rbx value becomes equal.
+
+   	0x0000000000400ef1 <+72>:	mov    0x18(%rsp),%rax
+   	0x0000000000400ef6 <+77>:	xor    %fs:0x28,%rax
+   	0x0000000000400eff <+86>:	je     0x400f06 <phase_2+93>
+   	0x0000000000400f01 <+88>:	callq  0x400b00 <__stack_chk_fail@plt>
+   	0x0000000000400f06 <+93>:	add    $0x28,%rsp
+   	0x0000000000400f0a <+97>:	pop    %rbx   //Retrieves an ite, removing the rest of th items in the stack
+   	0x0000000000400f0b <+98>:	pop    %rbp
+   	0x0000000000400f0c <+99>:	retq  
+   	
+//Looking at <+51>, w see that the values are doubling with whatever was in %eax (2 = 4).
+// The values are 1 2 4 8 16 32
+   	
+
+ Output
+ 1 2 4 8 16 32
+That's number 2.  Keep going!
+
+ Description
+ A number is getting compared to 1, and the bomb explodes if the number is not equals to 1. 
+ Therefore, we can conclude that the first number is 1. In phase 2, the function is looping over its input. 
+ The values are compared and if the value in %eax register matches with the given value, it jumps to next instruction. 
+ In comparison statement, we can use i r command to see the contents of the registers. 
+ %eax is the register to which our value  is compared, which is equals to 2. 
+ Therefore, the second integer is 2. 
+ By continuing to step through the code and seeing what %eax is equal to after each iteration, we will see a pattern in which the 
+ values are getting executed. Therefore, phase 2 values are 1 2 4 8 16 32.
+ 
