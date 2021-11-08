@@ -1,0 +1,103 @@
+Phase 4
+
+(gdb) break phase_4
+Breakpoint 2 at 0x40100e
+
+Input
+1  4
+Breakpoint 1, 0x000000000040100e in phase_4 ()
+
+
+Dump of assembler code for function func4:
+=> 	0x000000000040100e <+0>:	sub    $0x18,%rsp    						 //creating stack frame 
+   	0x0000000000401012 <+4>:	mov    %fs:0x28,%rax
+	   0x000000000040101b <+13>:	mov    %rax,0x8(%rsp)
+	   0x0000000000401020 <+18>:	xor    %eax,%eax
+   	0x0000000000401022 <+20>:	mov    %rsp,%rcx
+   	0x0000000000401025 <+23>:	lea    0x4(%rsp),%rdx
+   	0x000000000040102a <+28>:	mov    $0x4025b7,%esi    				//input format: %d %d
+   
+// (gdb) x/s 0x4025b7
+//  0x4025b7:	"%d %d"
+   
+   	0x000000000040102f <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>     //scanf function is called 
+=> 	0x0000000000401034 <+38>:	cmp    $0x2,%eax      					          //%eax: 2
+   	0x0000000000401037 <+41>:	jne    0x401044 <phase_4+54>      
+
+// Compare the value stored in %eax with 2. 
+//If the value in %eax is not equal to 2 then explode bomb function is called  
+   
+   
+   	0x0000000000401039 <+43>:	mov    (%rsp),%eax       					//The second value is  moved to %eax. From here we know that the inputs are read in reverse order.
+   	0x000000000040103c <+46>:	sub    $0x2,%eax      						//The value stored in %eax is than subtracted by 2 
+=> 	0x000000000040103f <+49>:	cmp    $0x2,%eax     
+   	0x0000000000401042 <+52>:	jbe    0x401049 <phase_4+59>    
+   
+// After subtracting, the values is stored in %eax and that value is compared with 2.
+//If the value is less than or equals to 2 it jumps to the next instruction or else the bomb explodes. From here we know our second value should be between 2 to 4.
+   
+   	0x0000000000401044 <+54>:	callq  0x401438 <explode_bomb>
+   	0x0000000000401049 <+59>:	mov    (%rsp),%esi    						//The second value is moved to the %esi.
+   	0x000000000040104c <+62>:	mov    $0x5,%edi    						//The value 5 is stored in the %edi.
+   	0x0000000000401051 <+67>:	callq  0x400fd3 <func4>    				//The func4 is called. From here the first value is generated
+=> 	0x0000000000401056 <+72>:	cmp    0x4(%rsp),%eax      
+   	0x000000000040105a <+76>:	je     0x401061 <phase_4+83>  
+   
+// 0x4(%rsp): First input is compared with the value stored in %eax. So based on the second value first value is generated. 
+//If the value we entered and the value stored in %eax is not equal than explode bomb function is called.
+// Since the value we entered (1) and the value in %eax are not equal change the value to 48 (or the value stored in %eax).
+ 
+   0x000000000040105c <+78>:	callq  0x401438 <explode_bomb>
+   0x0000000000401061 <+83>:	mov    0x8(%rsp),%rax
+   0x0000000000401066 <+88>:	xor    %fs:0x28,%rax
+   0x000000000040106f <+97>:	je     0x401076 <phase_4+104>
+   0x0000000000401071 <+99>:	callq  0x400b00 <__stack_chk_fail@plt>
+   0x0000000000401076 <+104>:	add    $0x18,%rsp
+   0x000000000040107a <+108>:	retq
+   
+
+
+
+   
+Dump of assembler code for function func4:
+=>   0x0000000000400fd3 <+0>:	test   %edi,%edi      					        //edi: 5 and ADN operation performed
+   	0x0000000000400fd5 <+2>:	jle    0x401002 <func4+47>  		        // if the vale us less than or equal to 0, jumps to +47 else jumps to next instruction 
+//Since the value (1) is greater than 0 moves to next instruction
+	   0x0000000000400fd7 <+4>:	mov    %esi,%eax   					            //%esi = 4
+	   0x0000000000400fd9 <+6>:	cmp    $0x1,%edi    					          // %edi: 5 is compared with 1
+	   0x0000000000400fdc <+9>:	je     0x40100c <func4+57> 			        // if the two values are equal the value is returned or else moved to next instruction
+	   0x0000000000400fde <+11>:	push   %r12
+	   0x0000000000400fe0 <+13>:	push   %rbp
+	   0x0000000000400fe1 <+14>:	push   %rbx
+	   0x0000000000400fe2 <+15>:	mov    %esi,%ebp   					          //%esi: 4 is moved to ebp
+	   0x0000000000400fe4 <+17>:	mov    %edi,%ebx      				        //%edi: 5 is moved to ebx
+	   0x0000000000400fe6 <+19>:	lea    -0x1(%rdi),%edi      				  //4 moved to %edi
+	   0x0000000000400fe9 <+22>:	callq  0x400fd3 <func4>      			    //calls function
+	   0x0000000000400fee <+27>:	lea    0x0(%rbp,%rax,1),%r12d    		  // %r12 = 32 (0x1c)
+	   0x0000000000400ff3 <+32>:	lea    -0x2(%rbx),%edi      			    //%edi = 3
+	   0x0000000000400ff6 <+35>:	mov    %ebp,%esi           				    //value 4 moved to %esi
+	   0x0000000000400ff8 <+37>:	callq  0x400fd3 <func4>
+	   0x0000000000400ffd <+42>:	add    %r12d,%eax         				    // Addition of values stored in %r12 (32) and %eax (16) and stored in %eax 
+   
+ // From here the first value is generated.
+	   0x0000000000401000 <+45>:	jmp    0x401008 <func4+53>
+	   0x0000000000401002 <+47>:	mov    $0x0,%eax
+	   0x0000000000401007 <+52>:	retq   
+	   0x0000000000401008 <+53>:	pop    %rbx
+	   0x0000000000401009 <+54>:	pop    %rbp
+	   0x000000000040100a <+55>:	pop    %r12
+	   0x000000000040100c <+57>:	repz retq 
+   
+Output
+
+48 4
+So you got that one.  Try this one.
+
+main (argc=<optimized out>, argv=<optimized out>) at bomb.c:96
+96	    phase_defused();
+
+Description 
+Two inputs are entered and based on the second value first value is generated.
+After subtracting the value with 2 and than comparing it with 2, we know that our second should be between 2 to 4.
+In comparison statement, we can use i r command to see the contents of the registers. 
+In second comparison statement, the first value is compared with the value stored in %eax. From here the first value is generated (found).
